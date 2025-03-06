@@ -1,0 +1,60 @@
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+
+# Go specific
+/vendor/
+/Godeps/
+
+# Environment files - ignore .env but keep .env.example
+.env
+.env.local
+
+# Output of the go coverage tool
+*.coverprofile
+coverage.txt
+cover.out
+
+# Log files
+*.log
+logs/
+log/
+
+# Dependency directories
+/bin/
+/pkg/
+/dist/
+
+# IDE specific files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Debug files
+debug
+__debug_bin
+
+# Project-specific build outputs
+/bookstore
+/bookstore-framework
+
+# Air live reload configuration (if you use it)
+/tmp/
+
+# Database files
+*.db
+*.sqlite
+
+# Generated swagger docs
+/docs/swagger/
+
+# Binary files that don't need version control
+cmd/api/api
