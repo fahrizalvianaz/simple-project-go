@@ -25,7 +25,7 @@ func (h *UserHandler) RegisterHandler(ctx *gin.Context) {
 		pkg.BadRequestResponse(ctx, "Invalid Request format", err.Error())
 	}
 
-	response, err := h.userService.Register(req)
+	response, err := h.userService.Register(ctx.Request.Context(), req)
 	if err != nil {
 		pkg.ErrorResponse(ctx, http.StatusBadRequest, err.Error(), nil)
 		return

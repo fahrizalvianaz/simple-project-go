@@ -1,11 +1,13 @@
 package users
 
 import (
+	"context"
+
 	"gorm.io/gorm"
 )
 
 type UserRepository interface {
-	Register(user *User) (*User, error)
+	Register(ctx context.Context, user *User) (*User, error)
 }
 
 type userRepository struct {
@@ -18,8 +20,8 @@ func NewUserRepository(db *gorm.DB) UserRepository {
 	}
 }
 
-func (r *userRepository) Register(user *User) (*User, error) {
-	result := r.db.Create(&user)
+func (r *userRepository) Register(ctx context.Context, user *User) (*User, error) {
+	result := r.db.WithContext(ctx).Create(&user)
 	if result.Error != nil {
 		return nil, result.Error
 	}

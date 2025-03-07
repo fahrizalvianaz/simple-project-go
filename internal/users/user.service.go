@@ -2,12 +2,13 @@ package users
 
 import (
 	"bookstore-framework/internal/users/api/dto"
+	"context"
 
 	"golang.org/x/crypto/bcrypt"
 )
 
 type UserService interface {
-	Register(req dto.RegisterRequest) (*dto.RegisterResponse, error)
+	Register(ctx context.Context, req dto.RegisterRequest) (*dto.RegisterResponse, error)
 }
 
 type userService struct {
@@ -20,7 +21,7 @@ func NewUserService(userRepo UserRepository) UserService {
 	}
 }
 
-func (s *userService) Register(req dto.RegisterRequest) (*dto.RegisterResponse, error) {
+func (s *userService) Register(ctx context.Context, req dto.RegisterRequest) (*dto.RegisterResponse, error) {
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
 	if err != nil {
 		return nil, err
@@ -31,7 +32,7 @@ func (s *userService) Register(req dto.RegisterRequest) (*dto.RegisterResponse, 
 		Password: string(hashedPassword),
 		Email:    req.Email,
 	}
-	registerUser, err := s.userRepo.Register(&user)
+	registerUser, err := s.userRepo.Register(ctx, &user)
 	if err != nil {
 		return nil, err
 	}
