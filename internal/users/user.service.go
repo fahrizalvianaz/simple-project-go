@@ -3,12 +3,14 @@ package users
 import (
 	"bookstore-framework/internal/users/api/dto"
 	"context"
+	"errors"
 
 	"golang.org/x/crypto/bcrypt"
 )
 
 type UserService interface {
 	Register(ctx context.Context, req dto.RegisterRequest) (*dto.RegisterResponse, error)
+	Login(ctx context.Context, req dto.LoginRequest) (*dto.LoginResponse, error)
 }
 
 type userService struct {
@@ -32,6 +34,7 @@ func (s *userService) Register(ctx context.Context, req dto.RegisterRequest) (*d
 		Password: string(hashedPassword),
 		Email:    req.Email,
 	}
+
 	registerUser, err := s.userRepo.Register(ctx, &user)
 	if err != nil {
 		return nil, err
@@ -45,5 +48,23 @@ func (s *userService) Register(ctx context.Context, req dto.RegisterRequest) (*d
 	}
 
 	return respone, nil
+
+}
+
+func (s *userService) Login(ctx context.Context, req dto.LoginRequest) (*dto.LoginResponse, error) {
+	user, err := s.userRepo.FindUserByUsername(ctx, req.Username)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password)); err != nil {
+		return nil, errors.New("invalid password or username")
+	}
+
+	respose := &dto.LoginResponse{
+		TokenAccess: "ini acess token",
+	}
+
+	return respose, nil
 
 }

@@ -8,3 +8,7 @@ type RegisterResponse struct {
 	Email     string    `json:"email"`
 	CreatedAt time.Time `json:"created_at"`
 }
+
+type LoginResponse struct {
+	TokenAccess string `json:"access_token"`
+}
