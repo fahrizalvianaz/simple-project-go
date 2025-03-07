@@ -12,6 +12,7 @@ import (
 type UserService interface {
 	Register(ctx context.Context, req dto.RegisterRequest) (*dto.RegisterResponse, error)
 	Login(ctx context.Context, req dto.LoginRequest) (*dto.LoginResponse, error)
+	GetProfile(ctx context.Context, userId uint) (*dto.ProfileResponse, error)
 }
 
 type userService struct {
@@ -72,4 +73,22 @@ func (s *userService) Login(ctx context.Context, req dto.LoginRequest) (*dto.Log
 
 	return respose, nil
 
+}
+
+func (s *userService) GetProfile(ctx context.Context, userId uint) (*dto.ProfileResponse, error) {
+	user, err := s.userRepo.FindUserByID(ctx, userId)
+	if err != nil {
+		return nil, err
+	}
+
+	response := &dto.ProfileResponse{
+		ID:         user.ID,
+		Username:   user.Username,
+		Name:       user.Name,
+		Email:      user.Email,
+		CreatedAt:  user.CreatedAt,
+		ModifiedAt: user.ModifiedAt,
+	}
+
+	return response, nil
 }

@@ -11,7 +11,10 @@ import (
 )
 
 func JWTAuth() gin.HandlerFunc {
-	var cfg configs.Config
+	cfg, err := configs.LoadConfig()
+	if err != nil {
+		panic("error when load config")
+	}
 	return func(ctx *gin.Context) {
 		authHeader := ctx.GetHeader("Authorization")
 		if authHeader == "" {

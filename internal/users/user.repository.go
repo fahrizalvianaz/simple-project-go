@@ -9,6 +9,7 @@ import (
 type UserRepository interface {
 	Register(ctx context.Context, user *User) (*User, error)
 	FindUserByUsername(ctx context.Context, username string) (*User, error)
+	FindUserByID(ctx context.Context, idUser uint) (*User, error)
 }
 
 type userRepository struct {
@@ -31,7 +32,17 @@ func (r *userRepository) Register(ctx context.Context, user *User) (*User, error
 
 func (r *userRepository) FindUserByUsername(ctx context.Context, username string) (*User, error) {
 	var user *User
-	result := r.db.Where("username = ?", username).First(&user)
+	result := r.db.WithContext(ctx).Where("username = ?", username).First(&user)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return user, nil
+}
+
+func (r *userRepository) FindUserByID(ctx context.Context, idUser uint) (*User, error) {
+	var user *User
+	result := r.db.WithContext(ctx).First(&user, idUser)
 	if result.Error != nil {
 		return nil, result.Error
 	}

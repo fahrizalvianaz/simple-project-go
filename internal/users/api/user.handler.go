@@ -50,3 +50,19 @@ func (h *UserHandler) LoginHandler(ctx *gin.Context) {
 
 	pkg.OkResponse(ctx, "Login Successfully", response)
 }
+
+func (h *UserHandler) GetProfile(ctx *gin.Context) {
+	userID, exist := ctx.Get("userID")
+	if !exist {
+		pkg.ErrorResponse(ctx, http.StatusUnauthorized, "User not found", nil)
+		return
+	}
+
+	profile, err := h.userService.GetProfile(ctx, userID.(uint))
+	if err != nil {
+		pkg.ErrorResponse(ctx, http.StatusInternalServerError, "Failed to retrieve profile", err.Error())
+		return
+	}
+
+	pkg.OkResponse(ctx, "Profile retrieve successfully", profile)
+}
