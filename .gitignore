@@ -25,36 +25,3 @@ cover.out
 logs/
 log/
 
-# Dependency directories
-/bin/
-/pkg/
-/dist/
-
-# IDE specific files
-.idea/
-.vscode/
-*.swp
-*.swo
-*~
-.DS_Store
-
-# Debug files
-debug
-__debug_bin
-
-# Project-specific build outputs
-/bookstore
-/bookstore-framework
-
-# Air live reload configuration (if you use it)
-/tmp/
-
-# Database files
-*.db
-*.sqlite
-
-# Generated swagger docs
-/docs/swagger/
-
-# Binary files that don't need version control
-cmd/api/api
