@@ -11,7 +11,7 @@ func Router(db *gorm.DB) *gin.Engine {
 	router := gin.Default()
 	group := router.Group("/api/v1")
 
-	api.RegisterUserRoutes(group.Group("/users"), db)
+	api.UsersRoutes(group.Group("/users"), db)
 
 	return router
 }

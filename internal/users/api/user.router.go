@@ -7,7 +7,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func RegisterUserRoutes(router *gin.RouterGroup, db *gorm.DB) {
+func UsersRoutes(router *gin.RouterGroup, db *gorm.DB) {
 
 	userRepository := users.NewUserRepository(db)
 	userService := users.NewUserService(userRepository)

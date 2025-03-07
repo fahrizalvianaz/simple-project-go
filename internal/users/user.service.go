@@ -2,6 +2,7 @@ package users
 
 import (
 	"bookstore-framework/internal/users/api/dto"
+	"bookstore-framework/pkg"
 	"context"
 	"errors"
 
@@ -61,8 +62,12 @@ func (s *userService) Login(ctx context.Context, req dto.LoginRequest) (*dto.Log
 		return nil, errors.New("invalid password or username")
 	}
 
+	token, err := pkg.GenerateToken(user.ID, user.Username, user.Email)
+	if err != nil {
+		return nil, err
+	}
 	respose := &dto.LoginResponse{
-		TokenAccess: "ini acess token",
+		TokenAccess: token,
 	}
 
 	return respose, nil
