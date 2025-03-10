@@ -6,6 +6,7 @@ import (
 	mocks "bookstore-framework/test/mock"
 	"context"
 	"testing"
+	"time"
 
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
@@ -76,6 +77,29 @@ func TestUserService_Success(t *testing.T) {
 		assert.NoError(t, err)
 		assert.NotNil(t, result)
 		assert.Equal(t, expectedRes.TokenAccess, result.TokenAccess)
+
+	})
+
+	t.Run("GetProfile", func(t *testing.T) {
+		ctx := context.Background()
+
+		mockUser := &users.User{
+			ID:         1,
+			Username:   "XXXX",
+			Name:       "testuser",
+			Email:      "XXXXXXXXXXXXXX",
+			CreatedAt:  time.Now(),
+			ModifiedAt: time.Now(),
+		}
+
+		mockRepo.EXPECT().FindUserByID(gomock.Any(), uint(1)).Return(mockUser, nil)
+
+		result, err := service.GetProfile(ctx, 1)
+
+		assert.NoError(t, err)
+		assert.NotNil(t, result)
+		assert.Equal(t, mockUser.ID, result.ID)
+		assert.Equal(t, mockUser.Username, result.Username)
 
 	})
 
