@@ -17,11 +17,13 @@ type UserService interface {
 
 type userService struct {
 	userRepo UserRepository
+	jwtGen   pkg.JWTGenerator
 }
 
-func NewUserService(userRepo UserRepository) UserService {
+func NewUserService(userRepo UserRepository, jwtGen pkg.JWTGenerator) UserService {
 	return &userService{
 		userRepo: userRepo,
+		jwtGen:   jwtGen,
 	}
 }
 
@@ -63,7 +65,7 @@ func (s *userService) Login(ctx context.Context, req dto.LoginRequest) (*dto.Log
 		return nil, errors.New("invalid password or username")
 	}
 
-	token, err := pkg.GenerateToken(user.ID, user.Username, user.Email)
+	token, err := s.jwtGen.GenerateToken(user.ID, user.Username, user.Email)
 	if err != nil {
 		return nil, err
 	}

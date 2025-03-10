@@ -7,6 +7,10 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
+type JWTGenerator interface {
+	GenerateToken(userId uint, username, email string) (string, error)
+}
+
 type Claims struct {
 	UserID   uint   `json:"userID"`
 	Username string `json:"username"`
@@ -14,7 +18,7 @@ type Claims struct {
 	jwt.RegisteredClaims
 }
 
-func GenerateToken(userId uint, username, email string) (string, error) {
+func (c *Claims) GenerateToken(userId uint, username, email string) (string, error) {
 	cfg, err := configs.LoadConfig()
 	if err != nil {
 		return "", err

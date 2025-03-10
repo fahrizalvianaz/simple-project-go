@@ -3,6 +3,7 @@ package api
 import (
 	"bookstore-framework/internal/users"
 	"bookstore-framework/middleware"
+	"bookstore-framework/pkg"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -10,7 +11,8 @@ import (
 
 func UsersRoutes(router *gin.RouterGroup, db *gorm.DB) {
 	userRepository := users.NewUserRepository(db)
-	userService := users.NewUserService(userRepository)
+	jwtGenerator := &pkg.Claims{}
+	userService := users.NewUserService(userRepository, jwtGenerator)
 	userHandler := NewUserHandler(userService)
 
 	router.POST("/register", userHandler.RegisterHandler)

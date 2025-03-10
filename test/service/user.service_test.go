@@ -5,11 +5,11 @@ import (
 	"bookstore-framework/internal/users/api/dto"
 	mocks "bookstore-framework/test/mock"
 	"context"
-	"fmt"
 	"testing"
 
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
+	"golang.org/x/crypto/bcrypt"
 )
 
 func TestUserService_Success(t *testing.T) {
@@ -18,29 +18,65 @@ func TestUserService_Success(t *testing.T) {
 	defer ctrl.Finish()
 
 	mockRepo := mocks.NewMockUserRepository(ctrl)
-	service := users.NewUserService(mockRepo)
+	jwtGen := mocks.NewMockJWTGenerator(ctrl)
+	service := users.NewUserService(mockRepo, jwtGen)
 
-	ctx := context.Background()
-	req := dto.RegisterRequest{
-		Username: "test",
-		Name:     "testuser",
-		Email:    "test@gmail.com",
-		Password: "password123",
-	}
+	t.Run("Register", func(t *testing.T) {
+		ctx := context.Background()
+		req := dto.RegisterRequest{
+			Username: "test",
+			Name:     "testuser",
+			Email:    "test@gmail.com",
+			Password: "password123",
+		}
 
-	expectedUser := &users.User{
-		ID:       1,
-		Name:     req.Name,
-		Username: req.Username,
-		Email:    req.Email,
-	}
+		expectedUser := &users.User{
+			ID:       1,
+			Name:     req.Name,
+			Username: req.Username,
+			Email:    req.Email,
+		}
 
-	mockRepo.EXPECT().Register(gomock.Any(), gomock.Any()).Return(expectedUser, nil)
+		mockRepo.EXPECT().Register(gomock.Any(), gomock.Any()).Return(expectedUser, nil)
 
-	result, err := service.Register(ctx, req)
+		result, err := service.Register(ctx, req)
 
-	fmt.Println(result)
-	assert.NoError(t, err)
-	assert.Equal(t, expectedUser.ID, result.ID)
-	assert.Equal(t, req.Username, result.Username)
+		assert.NoError(t, err)
+		assert.Equal(t, expectedUser.ID, result.ID)
+		assert.Equal(t, req.Username, result.Username)
+	})
+
+	t.Run("Login", func(t *testing.T) {
+		ctx := context.Background()
+		password := "password"
+		req := dto.LoginRequest{
+			Username: "test",
+			Password: password,
+		}
+
+		expectedToken := "mocked-jwt-token"
+		expectedRes := &dto.LoginResponse{
+			TokenAccess: expectedToken,
+		}
+
+		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+		assert.NoError(t, err)
+
+		mockUser := &users.User{
+			ID:       1,
+			Username: req.Username,
+			Email:    "test@example.com",
+			Password: string(hashedPassword),
+		}
+		mockRepo.EXPECT().FindUserByUsername(gomock.Any(), req.Username).Return(mockUser, nil)
+		jwtGen.EXPECT().GenerateToken(mockUser.ID, mockUser.Username, mockUser.Email).Return(expectedToken, nil)
+
+		result, err := service.Login(ctx, req)
+
+		assert.NoError(t, err)
+		assert.NotNil(t, result)
+		assert.Equal(t, expectedRes.TokenAccess, result.TokenAccess)
+
+	})
+
 }
