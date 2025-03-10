@@ -3,7 +3,9 @@ package repository_test
 import (
 	"bookstore-framework/internal/users"
 	"context"
+	"regexp"
 	"testing"
+	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/golang/mock/gomock"
@@ -38,7 +40,7 @@ func TestUserRepository_Success(t *testing.T) {
 	repo := users.NewUserRepository(gormDB)
 	t.Run("Register", func(t *testing.T) {
 		mock.ExpectBegin()
-		mock.ExpectQuery(`INSERT INTO "users"`).
+		mock.ExpectQuery(regexp.QuoteMeta(`INSERT INTO "users"`)).
 			WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(1))
 		mock.ExpectCommit()
 
@@ -59,19 +61,37 @@ func TestUserRepository_Success(t *testing.T) {
 	})
 
 	t.Run("FindUserByUsername", func(t *testing.T) {
-		username := "testuser"
-		columns := []string{"id", "username", "name", "email", "password"}
-		mock.ExpectBegin()
-		mock.ExpectQuery(`"SELECT .+ FORM "users" WHERE" username = .+`).
-			WithArgs(username).
+		username := "test"
+		columns := []string{"id", "username", "name", "email", "password", "created_at", "modified_at", "deleted_at"}
+
+		mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "users" WHERE username = $1 AND "users"."deleted_at" IS NULL`)).
+			WithArgs(username, 1).
 			WillReturnRows(sqlmock.NewRows(columns).
-				AddRow(1, "test", "testuser", "test@example.com", "hashedpassword"))
+				AddRow(1, "test", "testuser", "test@example.com", "hashedpassword", time.Now(), time.Now(), nil))
 
 		user, err := repo.FindUserByUsername(context.Background(), username)
 
 		assert.NoError(t, err)
 		assert.NotNil(t, user)
 		assert.Equal(t, username, user.Username)
+
+		err = mock.ExpectationsWereMet()
+		assert.NoError(t, err)
+
+	})
+
+	t.Run("FindUserByID", func(t *testing.T) {
+		idUser := 1
+		columns := []string{"id", "username", "name", "email", "password", "created_at", "modified_at", "deleted_at"}
+
+		mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "users" WHERE "users"."id" = $1 AND "users"."deleted_at" IS NULL`)).
+			WithArgs(idUser, 1).
+			WillReturnRows(sqlmock.NewRows(columns).
+				AddRow(1, "test", "testuser", "test@example.com", "hashedpassword", time.Now(), time.Now(), nil))
+		user, err := repo.FindUserByID(context.Background(), uint(idUser))
+		assert.NoError(t, err)
+		assert.NotNil(t, user)
+		assert.Equal(t, int(idUser), int(user.ID))
 
 		err = mock.ExpectationsWereMet()
 		assert.NoError(t, err)
