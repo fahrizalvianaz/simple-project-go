@@ -3,6 +3,7 @@ package handler_test
 import (
 	"bookstore-framework/internal/users/api"
 	"bookstore-framework/internal/users/api/dto"
+	"bookstore-framework/pkg"
 	mocks "bookstore-framework/test/mock"
 	"bytes"
 	"encoding/json"
@@ -55,10 +56,20 @@ func TestUserHandler_Success(t *testing.T) {
 
 	assert.Equal(t, http.StatusCreated, w.Code)
 
-	var response dto.RegisterResponse
+	var response pkg.Response
 	err = json.Unmarshal(w.Body.Bytes(), &response)
 	require.NoError(t, err)
-	assert.Equal(t, data.ID, data.ID)
-	assert.Equal(t, data.Username, response.Username)
+
+	assert.Equal(t, http.StatusCreated, response.Code)
+	assert.Equal(t, true, response.Status)
+	assert.Equal(t, "User registered successfully", response.Message)
+
+	var registerReponse dto.RegisterResponse
+
+	dataBytes, _ := json.Marshal(response.Data)
+	json.Unmarshal(dataBytes, &registerReponse)
+
+	assert.Equal(t, data.ID, registerReponse.ID)
+	assert.Equal(t, data.Username, registerReponse.Username)
 
 }

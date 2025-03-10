@@ -5,6 +5,7 @@ import (
 	"bookstore-framework/internal/users/api/dto"
 	mocks "bookstore-framework/test/mock"
 	"context"
+	"fmt"
 	"testing"
 
 	"github.com/golang/mock/gomock"
@@ -38,6 +39,7 @@ func TestUserService_Success(t *testing.T) {
 
 	result, err := service.Register(ctx, req)
 
+	fmt.Println(result)
 	assert.NoError(t, err)
 	assert.Equal(t, expectedUser.ID, result.ID)
 	assert.Equal(t, req.Username, result.Username)
