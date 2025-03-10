@@ -1,198 +1,146 @@
-# Bookstore API Framework
+# User Authentication and Management Service with JWT Support
 
-A robust, Go-based RESTful API framework for managing bookstore operations with authentication, user management, and comprehensive CRUD operations.
+A robust Go-based user authentication and management service that provides secure user registration, login, and profile management with JWT-based authentication. The service offers a RESTful API interface with standardized response handling and comprehensive test coverage.
 
-## 📋 Table of Contents
+This service is built using modern Go practices and industry-standard libraries including Gin for HTTP routing, GORM for database operations, and JWT for secure authentication. It features a clean architecture with clear separation of concerns between handlers, services, and repositories, making it both maintainable and extensible.
 
-- Features
-- Project Structure
-- Installation
-- Configuration
-- API Documentation
-- Authentication
-- Database
-- Deployment
-- Testing
-- Contributing
+Key features include:
+- Secure user registration with password hashing
+- JWT-based authentication with configurable token expiration
+- Protected profile endpoints
+- PostgreSQL database integration with automatic migrations
+- Comprehensive test coverage with mocking
+- Standardized API response formatting
+- Environment-based configuration management
 
-## ✨ Features
-
-- **User Management:** Registration, authentication, and profile management
-- **JWT Authentication:** Secure route protection with JSON Web Tokens
-- **RESTful API Design:** Clean API architecture following REST principles
-- **Database Integration:** GORM-based PostgreSQL integration with migrations
-- **Error Handling:** Consistent error responses and logging
-- **Environment Configuration:** Environment-based configuration management
-- **Middleware Support:** Request logging, authentication, CORS, etc.
-
-## 🏗️ Project Structure
-
+## Repository Structure
 ```
-bookstore-framework/
-├── .env                      # Environment variables (not tracked in git)
-├── .env.example              # Example environment configuration
-├── configs/                  # Configuration setup
-│   └── config.go             # Application configuration
-├── internal/                 # Internal application packages
-│   ├── users/                # User domain
-│   │   ├── api/              # API layer
-│   │   │   ├── dto/          # Data Transfer Objects
-│   │   │   ├── user.handler.go # HTTP handlers
-│   │   │   └── user.router.go  # Route definitions
-│   │   ├── user.model.go     # User data model
-│   │   ├── user.repository.go # Data access layer
-│   │   └── user.service.go   # Business logic layer
-│   └── books/                # Books domain (similar structure)
-├── middleware/               # HTTP middlewares
-│   └── middleware.go         # JWT authentication and other middlewares
-├── migrations/               # Database migrations
-│   └── migrations.go         # Auto-migration setup
-├── pkg/                      # Shared utility packages
-│   ├── config.db.go          # Database connection setup
-│   ├── generateToken.go      # JWT token generation
-│   └── genericResponse.go    # Standardized response format
-├── main.go                   # Application entry point
-└── README.md                 # Project documentation
+.
+├── cmd/
+│   └── main.go                 # Application entry point
+├── configs/
+│   └── config.go               # Configuration management
+├── internal/
+│   └── users/                  # User domain implementation
+│       ├── api/                # HTTP handlers and DTOs
+│       ├── user.model.go       # User domain model
+│       ├── user.repository.go  # Database operations
+│       └── user.service.go     # Business logic
+├── middleware/
+│   └── middleware.go           # JWT authentication middleware
+├── migrations/
+│   └── migrations.go           # Database migration handler
+├── pkg/                        # Shared utilities
+│   ├── config.db.go           # Database connection
+│   ├── generateToken.go       # JWT token generation
+│   └── genericResponse.go     # API response formatting
+└── test/                      # Test suites
+    ├── handler/               # Handler tests
+    ├── repository/           # Repository tests
+    └── service/              # Service tests
 ```
 
-## 🚀 Installation
-
+## Usage Instructions
 ### Prerequisites
+- Go 1.16 or higher
+- PostgreSQL 12 or higher
+- Environment variables configured in `.env` file
 
-- Go 1.18 or later
-- PostgreSQL 12 or later
-- Git
-
-### Steps
-
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/yourusername/bookstore-framework.git
-   cd bookstore-framework
-   ```
-
-2. **Install dependencies:**
-   ```bash
-   go mod download
-   ```
-
-3. **Set up environment variables:**
-   ```bash
-   cp .env.example .env
-   # Edit .env with your configuration
-   ```
-
-4. **Run the application:**
-   ```bash
-   go run main.go
-   ```
-
-## ⚙️ Configuration
-
-### Environment Variables
-
+### Installation
+1. Clone the repository:
+```bash
+git clone <repository-url>
+cd <repository-name>
 ```
-# Database
+
+2. Install dependencies:
+```bash
+go mod download
+```
+
+3. Set up environment variables in `.env`:
+```env
 DB_HOST=localhost
 DB_PORT=5432
 DB_USER=postgres
-DB_PASSWORD=yourpassword
-DB_NAME=bookstore
-
-# JWT
-SECRET_KEY=your-secret-key
-TOKEN_ISSUER=bookstore-framework-api
-TOKEN_AUDIENCE=bookstore-clients
+DB_PASSWORD=your_password
+DB_NAME=your_database
+SECRET_KEY=your_secret_key
+TOKEN_ISSUER=your_issuer
+TOKEN_AUDIENCE=your_audience
 ```
 
-## 📚 API Documentation
-
-### Authentication Endpoints
-
-#### Register a new user
-```
-POST /api/users/register
-```
-**Request Body:**
-```json
-{
-  "username": "johndoe",
-  "email": "john@example.com",
-  "password": "securepassword",
-  "full_name": "John Doe"
-}
+### Quick Start
+1. Start the server:
+```bash
+go run cmd/main.go
 ```
 
-#### User Login
-```
-POST /api/users/login
-```
-**Request Body:**
-```json
-{
-  "username": "johndoe",
-  "password": "securepassword"
-}
-```
-**Response:**
-```json
-{
-  "code": 200,
-  "message": "Login successful",
-  "status": true,
-  "data": {
-    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-    "user": {
-      "id": 1,
-      "username": "johndoe",
-      "email": "john@example.com",
-      "full_name": "John Doe",
-      "created_at": "2025-03-06T13:45:22Z"
-    }
-  }
-}
+2. Register a new user:
+```bash
+curl -X POST http://localhost:8080/api/v1/users/register \
+  -H "Content-Type: application/json" \
+  -d '{"username":"testuser","password":"password123","email":"test@example.com","name":"Test User"}'
 ```
 
-#### Get User Profile (Protected Route)
-```
-GET /api/users/profile
-```
-**Headers:**
-```
-Authorization: Bearer your-jwt-token
+3. Login to get JWT token:
+```bash
+curl -X POST http://localhost:8080/api/v1/users/login \
+  -H "Content-Type: application/json" \
+  -d '{"username":"testuser","password":"password123"}'
 ```
 
-## 🔐 Authentication
+### More Detailed Examples
+1. Get user profile (protected endpoint):
+```bash
+curl http://localhost:8080/api/v1/users/profile \
+  -H "Authorization: Bearer <your_jwt_token>"
+```
 
-The API uses JSON Web Tokens (JWT) for authentication:
+### Troubleshooting
+1. Database Connection Issues
+- Error: "Failed to connect to database"
+- Solution: 
+  1. Verify PostgreSQL is running
+  2. Check database credentials in `.env`
+  3. Ensure database exists and is accessible
 
-1. **How it works:**
-   - User logs in with credentials and receives a JWT token
-   - Token must be included in the `Authorization` header as `Bearer token` for protected routes
-   - Token contains encoded user information and an expiration time
+2. JWT Authentication Issues
+- Error: "invalid or expired token"
+- Solution:
+  1. Verify token hasn't expired (default 24h)
+  2. Ensure correct token format: `Bearer <token>`
+  3. Check SECRET_KEY matches the one used for token generation
 
-2. **JWT Claims:**
-   - `user_id`: Unique user identifier
-   - `username`: User's username
-   - `email`: User's email
-   - Standard claims: `exp` (expiration), `iat` (issued at), `nbf` (not before)
+## Data Flow
+The service follows a three-tier architecture with clear separation between API handlers, business logic, and data access.
 
-3. **Protected Routes:**
-   - All routes requiring authentication are protected by the `middleware.JWTAuth()` middleware
-   - Middleware validates token signature, expiration, and extracts user information
+```ascii
+Client Request → JWT Middleware → Handler → Service → Repository → Database
+     ↑                                                               ↓
+     └───────────────── Response ← Handler ← Service ← Repository ←──┘
+```
 
-## 💾 Database
+Component interactions:
+1. JWT Middleware validates authentication token and extracts user context
+2. Handlers validate request data and convert to domain models
+3. Service layer implements business logic and orchestrates operations
+4. Repository layer handles database operations using GORM
+5. Standardized response formatting for consistent API responses
+6. Error handling at each layer with appropriate HTTP status codes
+7. Database transactions managed at repository level
+
+## Infrastructure
+
+![Infrastructure diagram](./docs/infra.svg)
+### Database Resources
+- Table: `users`
+  - Primary key: `id`
+  - Unique constraints: `username`, `email`
+  - Soft delete support via `deleted_at`
 
 ### Migrations
-
-The application uses GORM's AutoMigrate feature to manage database schema:
-
+The service automatically runs migrations on startup to ensure database schema is up to date:
 ```go
-// Running migrations
-func Migrate(db *gorm.DB) error {
-    return db.AutoMigrate(
-        &users.User{},
-        // Other models
-    )
-}
+migrations.Migrate(db)
 ```
