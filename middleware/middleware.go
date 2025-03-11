@@ -25,7 +25,7 @@ func JWTAuth() gin.HandlerFunc {
 
 		parts := strings.SplitN(authHeader, " ", 2)
 		if !(len(parts) == 2 && parts[0] == "Bearer") {
-			pkg.ErrorResponse(ctx, http.StatusUnauthorized, "invalid authorization foramt", nil)
+			pkg.ErrorResponse(ctx, http.StatusUnauthorized, "invalid authorization format", nil)
 			ctx.Abort()
 			return
 		}
