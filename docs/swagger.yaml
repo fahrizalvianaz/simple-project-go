@@ -1,5 +1,32 @@
 basePath: /api/v1
 definitions:
+  dto.LoginRequest:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    type: object
+  dto.LoginResponse:
+    properties:
+      access_token:
+        type: string
+    type: object
+  dto.ProfileResponse:
+    properties:
+      created_at:
+        type: string
+      email:
+        type: string
+      id:
+        type: integer
+      modified_at:
+        type: string
+      name:
+        type: string
+      username:
+        type: string
+    type: object
   dto.RegisterRequest:
     description: Registration request payload
     properties:
@@ -55,6 +82,63 @@ info:
   title: Bookstore Management API
   version: 1.0.0
 paths:
+  /users/login:
+    post:
+      consumes:
+      - application/json
+      description: Login user account
+      parameters:
+      - description: User information
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Login successfully
+          schema:
+            allOf:
+            - $ref: '#/definitions/pkg.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.LoginResponse'
+              type: object
+        "400":
+          description: Invalid Request format
+          schema:
+            $ref: '#/definitions/pkg.Response'
+      summary: Login user
+      tags:
+      - users
+  /users/profile:
+    get:
+      consumes:
+      - application/json
+      description: Get user account
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Profile retrieve successfully
+          schema:
+            allOf:
+            - $ref: '#/definitions/pkg.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.ProfileResponse'
+              type: object
+        "400":
+          description: Invalid Request format
+          schema:
+            $ref: '#/definitions/pkg.Response'
+      security:
+      - BearerAuth: []
+      summary: Get User
+      tags:
+      - users
   /users/register:
     post:
       consumes:

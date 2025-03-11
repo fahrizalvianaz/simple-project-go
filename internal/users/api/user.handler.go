@@ -45,6 +45,16 @@ func (h *UserHandler) RegisterHandler(ctx *gin.Context) {
 	pkg.CreatedResponse(ctx, "User registered successfully", response)
 }
 
+// LoginHandler godoc
+// @Summary      Login user
+// @Description  Login user account
+// @Tags         users
+// @Accept       json
+// @Produce      json
+// @Param        request body     dto.LoginRequest true "User information"
+// @Success      201  {object}    pkg.Response{data=dto.LoginResponse} "Login successfully"
+// @Failure      400  {object}    pkg.Response "Invalid Request format"
+// @Router       /users/login [post]
 func (h *UserHandler) LoginHandler(ctx *gin.Context) {
 	var req dto.LoginRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -61,6 +71,16 @@ func (h *UserHandler) LoginHandler(ctx *gin.Context) {
 	pkg.OkResponse(ctx, "Login Successfully", response)
 }
 
+// LoginHandler godoc
+// @Summary      Get User
+// @Description  Get user account
+// @Tags         users
+// @Security BearerAuth
+// @Accept       json
+// @Produce      json
+// @Success      201  {object}    pkg.Response{data=dto.ProfileResponse} "Profile retrieve successfully"
+// @Failure      400  {object}    pkg.Response "Invalid Request format"
+// @Router       /users/profile [get]
 func (h *UserHandler) GetProfile(ctx *gin.Context) {
 	userID, exist := ctx.Get("userID")
 	if !exist {
