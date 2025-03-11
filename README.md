@@ -1,79 +1,61 @@
-# User Authentication and Management Service with JWT Support
+# Bookstore Management API: A Secure and Scalable User Management System
 
-A robust Go-based user authentication and management service that provides secure user registration, login, and profile management with JWT-based authentication. The service offers a RESTful API interface with standardized response handling and comprehensive test coverage.
+The Bookstore Management API is a RESTful service that provides robust user management capabilities for bookstore applications. Built with Go and the Gin web framework, it offers secure user authentication, profile management, and seamless database integration with PostgreSQL.
 
-This service is built using modern Go practices and industry-standard libraries including Gin for HTTP routing, GORM for database operations, and JWT for secure authentication. It features a clean architecture with clear separation of concerns between handlers, services, and repositories, making it both maintainable and extensible.
-
-Key features include:
-- Secure user registration with password hashing
-- JWT-based authentication with configurable token expiration
-- Protected profile endpoints
-- PostgreSQL database integration with automatic migrations
-- Comprehensive test coverage with mocking
-- Standardized API response formatting
-- Environment-based configuration management
+The API implements industry-standard security practices including JWT-based authentication, password hashing, and middleware protection for sensitive endpoints. It features a clean architecture with clear separation of concerns, comprehensive test coverage, and auto-generated Swagger documentation for easy API exploration and integration.
 
 ## Repository Structure
 ```
 .
-├── cmd/
-│   └── main.go                 # Application entry point
-├── configs/
-│   └── config.go               # Configuration management
-├── internal/
-│   └── users/                  # User domain implementation
-│       ├── api/                # HTTP handlers and DTOs
-│       ├── user.model.go       # User domain model
-│       ├── user.repository.go  # Database operations
-│       └── user.service.go     # Business logic
-├── middleware/
-│   └── middleware.go           # JWT authentication middleware
-├── migrations/
-│   └── migrations.go           # Database migration handler
-├── pkg/                        # Shared utilities
-│   ├── config.db.go           # Database connection
-│   ├── generateToken.go       # JWT token generation
-│   └── genericResponse.go     # API response formatting
-└── test/                      # Test suites
-    ├── handler/               # Handler tests
-    ├── repository/           # Repository tests
-    └── service/              # Service tests
+├── configs/                 # Configuration management for database and JWT settings
+├── docs/                    # API documentation and infrastructure diagrams
+│   ├── swagger.json        # OpenAPI/Swagger specification in JSON format
+│   └── swagger.yaml        # OpenAPI/Swagger specification in YAML format
+├── internal/               # Core application logic
+│   └── users/             # User management domain
+│       ├── api/           # HTTP handlers and DTOs
+│       ├── user.model.go  # User entity definition
+│       ├── user.repository.go # Data access layer
+│       └── user.service.go    # Business logic layer
+├── middleware/            # HTTP middleware including JWT authentication
+├── migrations/           # Database migration scripts
+├── pkg/                 # Shared utilities and helpers
+│   ├── config.db.go    # Database connection configuration
+│   ├── generateToken.go # JWT token generation
+│   └── genericResponse.go # Standardized API response handling
+├── routes/              # API route definitions
+└── test/               # Test suites for all components
 ```
 
 ## Usage Instructions
 ### Prerequisites
 - Go 1.16 or higher
 - PostgreSQL 12 or higher
-- Environment variables configured in `.env` file
+- Environment variables configured in `.env` file:
+  - Database connection details (DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_NAME)
+  - JWT configuration (SECRET_KEY, TOKEN_ISSUER, TOKEN_AUDIENCE)
 
 ### Installation
-1. Clone the repository:
 ```bash
+# Clone the repository
 git clone <repository-url>
-cd <repository-name>
-```
+cd bookstore-framework
 
-2. Install dependencies:
-```bash
+# Install dependencies
 go mod download
-```
 
-3. Set up environment variables in `.env`:
-```env
-DB_HOST=localhost
-DB_PORT=5432
-DB_USER=postgres
-DB_PASSWORD=your_password
-DB_NAME=your_database
-SECRET_KEY=your_secret_key
-TOKEN_ISSUER=your_issuer
-TOKEN_AUDIENCE=your_audience
+# Set up environment variables
+cp .env.example .env
+# Edit .env with your configuration
+
+# Run the application
+go run main.go
 ```
 
 ### Quick Start
 1. Start the server:
 ```bash
-go run cmd/main.go
+go run main.go
 ```
 
 2. Register a new user:
@@ -91,56 +73,89 @@ curl -X POST http://localhost:8080/api/v1/users/login \
 ```
 
 ### More Detailed Examples
-1. Get user profile (protected endpoint):
+1. Get user profile (authenticated request):
 ```bash
-curl http://localhost:8080/api/v1/users/profile \
-  -H "Authorization: Bearer <your_jwt_token>"
+curl -X GET http://localhost:8080/api/v1/users/profile \
+  -H "Authorization: Bearer <your-jwt-token>"
 ```
 
 ### Troubleshooting
 1. Database Connection Issues
 - Error: "Failed to connect to database"
-- Solution: 
-  1. Verify PostgreSQL is running
-  2. Check database credentials in `.env`
-  3. Ensure database exists and is accessible
+- Solution:
+  ```bash
+  # Check database connectivity
+  pg_isready -h <DB_HOST> -p <DB_PORT>
+  
+  # Verify environment variables
+  echo $DB_HOST $DB_PORT $DB_USER
+  ```
 
 2. JWT Authentication Issues
 - Error: "invalid or expired token"
 - Solution:
-  1. Verify token hasn't expired (default 24h)
-  2. Ensure correct token format: `Bearer <token>`
-  3. Check SECRET_KEY matches the one used for token generation
+  - Ensure token is not expired (default expiration is 24 hours)
+  - Verify token format: `Bearer <token>`
+  - Check SECRET_KEY in environment variables
+
+3. Debug Mode
+```bash
+# Enable debug logging
+export GIN_MODE=debug
+go run main.go
+```
 
 ## Data Flow
-The service follows a three-tier architecture with clear separation between API handlers, business logic, and data access.
+The API follows a layered architecture for processing user-related operations, with clear separation between HTTP handling, business logic, and data access.
 
 ```ascii
 Client Request → JWT Middleware → Handler → Service → Repository → Database
-     ↑                                                               ↓
-     └───────────────── Response ← Handler ← Service ← Repository ←──┘
+     ↑                                                                ↓
+     └────────────────── Response ←────────────────────────────────←─┘
 ```
 
 Component interactions:
-1. JWT Middleware validates authentication token and extracts user context
-2. Handlers validate request data and convert to domain models
-3. Service layer implements business logic and orchestrates operations
+1. JWT Middleware validates authentication tokens and injects user context
+2. Handlers receive HTTP requests and transform them into service calls
+3. Service layer implements business logic and validation rules
 4. Repository layer handles database operations using GORM
-5. Standardized response formatting for consistent API responses
-6. Error handling at each layer with appropriate HTTP status codes
-7. Database transactions managed at repository level
+5. Database stores user data in PostgreSQL
+6. Responses are standardized using the generic response package
+7. Error handling occurs at each layer with appropriate status codes
 
 ## Infrastructure
 
 ![Infrastructure diagram](./docs/infra.svg)
-### Database Resources
-- Table: `users`
-  - Primary key: `id`
-  - Unique constraints: `username`, `email`
-  - Soft delete support via `deleted_at`
+### Database
+- AWS::RDS::DBInstance: BookstoreDatabase
+  - PostgreSQL database for storing user data
 
-### Migrations
-The service automatically runs migrations on startup to ensure database schema is up to date:
-```go
-migrations.Migrate(db)
+### Compute
+- AWS::EC2::Instance: BookstoreServer
+  - Hosts the API application
+  - Connects to BookstoreDatabase
+
+## Deployment
+### Prerequisites
+- AWS CLI configured with appropriate permissions
+- Environment variables set for AWS credentials
+
+### Deployment Steps
+1. Database Setup
+```bash
+# Run migrations
+go run migrations/migrations.go
 ```
+
+2. Application Deployment
+```bash
+# Build application
+go build -o bookstore-api
+
+# Start application
+./bookstore-api
+```
+
+3. Monitoring Setup
+- Configure AWS CloudWatch for logs and metrics
+- Set up health check endpoint monitoring
