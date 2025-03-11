@@ -19,6 +19,16 @@ func NewUserHandler(userService users.UserService) *UserHandler {
 	}
 }
 
+// RegisterHandler godoc
+// @Summary      Register a new user
+// @Description  Create a new user account
+// @Tags         users
+// @Accept       json
+// @Produce      json
+// @Param        request body     dto.RegisterRequest true "User information"
+// @Success      201  {object}    pkg.Response{data=dto.RegisterResponse} "User registered successfully"
+// @Failure      400  {object}    pkg.Response "Invalid Request format"
+// @Router       /users/register [post]
 func (h *UserHandler) RegisterHandler(ctx *gin.Context) {
 	var req dto.RegisterRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
