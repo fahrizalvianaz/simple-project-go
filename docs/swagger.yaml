@@ -1,11 +1,17 @@
 basePath: /api/v1
 definitions:
   dto.LoginRequest:
+    description: Login request payload
     properties:
       password:
+        example: xxxxxxx
         type: string
       username:
+        example: johndoe
         type: string
+    required:
+    - password
+    - username
     type: object
   dto.LoginResponse:
     properties:

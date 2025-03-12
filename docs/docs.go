@@ -176,13 +176,20 @@ const docTemplate = `{
     },
     "definitions": {
         "dto.LoginRequest": {
+            "description": "Login request payload",
             "type": "object",
+            "required": [
+                "password",
+                "username"
+            ],
             "properties": {
                 "password": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "xxxxxxx"
                 },
                 "username": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "johndoe"
                 }
             }
         },

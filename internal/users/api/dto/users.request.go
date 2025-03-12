@@ -9,6 +9,8 @@ type RegisterRequest struct {
 	Password string `json:"password" binding:"required" example:"xxxxxxx"`
 }
 
+// LoginRequest represents a registration request
+// @Description Login request payload
 type LoginRequest struct {
 	Username string `json:"username" binding:"required" example:"johndoe"`
 	Password string `json:"password" binding:"required" example:"xxxxxxx"`
