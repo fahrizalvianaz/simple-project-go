@@ -1,6 +1,7 @@
-FROM golang:1.21-alphine AS builder
+FROM golang:1.24-alpine AS builder
 
 WORKDIR /app
+
 
 COPY go.mod go.sum ./
 
@@ -10,7 +11,7 @@ COPY . .
 
 RUN CGO_ENABLED=0 GOOS=linux go build -o bookstore-app .
 
-FROM alpine:latest
+FROM alpine:3.17
 
 RUN apk --no-cache add ca-certificates
 
